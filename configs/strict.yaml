@@ -1,0 +1,73 @@
+project_root: .
+seed: 0
+device: cuda
+data:
+  source_sample_rate: 44100
+  clip_seconds: 5
+  esc50_dir: assets/ESC-50
+  metadata_file: meta/esc50.csv
+  audio_dir: audio
+vendor:
+  root: vendor
+  passt_commit: d7049e78e84ba38173ffd779479d1c9ec7d1c116
+  msclap_commit: e8a6467b87cd85716e20c6a008126150d9740be0
+  beats_commit: 732d834db70ee0fc3886b4bcbcfb4ce7fb829be2
+  esc50_commit: 33c8ce9eb2cf0b1c2f8bcf322eb349b6be34dbb6
+weights:
+  root: assets/weights
+  passt_pattern: passt/esc50-passt-s-n-f128-p16-s10-fold{fold}-acc.{suffix}.pt
+  msclap: msclap/CLAP_weights_2023.pth
+  beats: beats/BEATs_iter3_plus_AS2M.pt
+  gpt2_dir: assets/gpt2
+outputs:
+  root: outputs
+corruption:
+  cutoff_hz: 1000
+  orders: [1, 2, 3, 4]
+  snrs_db: [-5, -10, -15]
+  noise_reference: filtered
+  mask_inclusive: true
+models:
+  passt:
+    sample_rate: 32000
+    batch_size: 64
+    default_ending_block: 10
+    figure7_blocks: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  msclap:
+    sample_rate: 44100
+    batch_size: 32
+    default_ending_block: 2
+    figure7_blocks: [0, 1, 2, 3]
+    prompt: this is a sound of {label}
+  beats:
+    sample_rate: 16000
+    batch_size: 64
+    default_ending_block: 3
+    figure7_blocks: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+beats_training:
+  batch_size: 16
+  max_epochs: 50
+  patience: 8
+  warmup_fraction: 0.05
+  gradient_clip: 5.0
+  learning_rates: [0.00001, 0.00003, 0.0001]
+  weight_decays: [0.0, 0.01]
+sensitivity:
+  cutoffs_hz: [500, 1000, 2000]
+  noise_references: [filtered, clean]
+  mask_inclusive: [true, false]
+  robustness_seeds: [1, 2, 3, 4]
+acceptance:
+  table_mae_pp: 2.0
+  headline_gain_error_pp: 2.0
+  gain_sign_agreement: 0.9
+  gain_spearman: 0.9
+  figure_spearman: 0.8
+  ending_block_error: 1
+clean_acceptance:
+  passt_expected: [96.7, 97.7, 95.9, 98.7, 96.2]
+  passt_fold_tolerance_pp: 0.5
+  msclap_expected: 93.9
+  msclap_tolerance_pp: 2.0
+  beats_expected: 98.1
+  beats_tolerance_pp: 2.0
