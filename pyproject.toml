@@ -22,6 +22,8 @@ dependencies = [
   "torchlibrosa==0.1.0",
   "tqdm>=4.66,<5",
   "transformers==4.34.1",
+  "torch>=2.0",
+  "torchaudio>=2.0",
 ]
 
 [project.optional-dependencies]
